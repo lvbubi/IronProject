@@ -1,16 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
-
 class BodyPart
 {
     string id;
     int energyCost;
-
+    bool durability;
     public
     BodyPart(string id,int energyCost)
     {
+        durability = true;
         this.id = id;
         this.energyCost = energyCost;
     }
@@ -18,6 +17,16 @@ class BodyPart
     {
         return energyCost;
     }
+    public bool CheckPart()
+    {
+        if (!durability)
+            throw new System.ArgumentException(id+" is broken", "original");
+        int number = Random.Range(0, 1000);
+        if ( number == 999)
+            return false;
+        return true;
+    }
+
     public virtual int useFunction()
     {
         return 0;
@@ -46,6 +55,7 @@ class Leg :  BodyPart
     }
     public override int useFunction()
     {
+        CheckPart();
         return 2;
 
     }
@@ -58,6 +68,7 @@ class Head : BodyPart
     }
     public override int useFunction()
     {
+        CheckPart();
         return 1;
     }
 }
@@ -70,6 +81,7 @@ class Chest : BodyPart
     }
     public override int useFunction()
     {
+        CheckPart();
         return 1;
     }
 }
@@ -82,6 +94,7 @@ class Arm : BodyPart
     }
     public override int useFunction()
     {
+        CheckPart();
         return 2;
     }
 }
@@ -122,6 +135,7 @@ class IronMan
 
     public void leftArmShoot()
     {
+        BodyParts[0].CheckPart();
         int energyCost = 0;
         foreach (BodyPart bodypart in BodyParts)
             if ( bodypart.getName().Equals("LeftArm"))
@@ -153,21 +167,46 @@ class IronMan
 
 public class Controller : MonoBehaviour {
     IronMan ironman=new IronMan();
-	// Use this for initialization
-	void Start () {
-        Debug.Log(ironman.getEneryLevel());
-        ironman.Moove();
-        Debug.Log(ironman.getEneryLevel());
-        ironman.Fly();
-        Debug.Log(ironman.getEneryLevel());
-        ironman.leftArmShoot();
-        Debug.Log(ironman.getEneryLevel());
-        ironman.chestShoot();
-        Debug.Log(ironman.getEneryLevel());
+    private float nextActionTime = 0f;
+    public float period = 5;
+    bool fly = false;
+    // Use this for initialization
+    void Start () {
+        try
+        {
+            Debug.Log(ironman.getEneryLevel());
+            ironman.Moove();
+            Debug.Log(ironman.getEneryLevel());
+            ironman.Fly();
+            Debug.Log(ironman.getEneryLevel());
+            ironman.leftArmShoot();
+            Debug.Log(ironman.getEneryLevel());
+            ironman.chestShoot();
+            Debug.Log(ironman.getEneryLevel());
+        }
+        catch (System.ArgumentException ex)
+        {
+            Debug.Log(ex.Message);
+        }
     }
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            fly = !fly;
+            GetComponent<Animator>().SetBool("Fly", (!GetComponent<Animator>().GetBool("Fly")));
+        }
+
+        if (Time.time > nextActionTime)
+        {
+            nextActionTime += period;
+            if (fly)
+            {
+                ironman.Fly();
+                Debug.Log(ironman.getEneryLevel());
+                
+            }
+        }
+    }
 }
