@@ -22,8 +22,8 @@ class BodyPart
         if (!durability)
             throw new System.ArgumentException(id+" is broken", "original");
         int number = Random.Range(0, 1000);
-        if ( number == 999)
-            return false;
+        if (number == 1)
+            durability = false;
         return true;
     }
 
@@ -39,7 +39,6 @@ class BodyPart
     {
         return 0;
     }
-
 
     public string getName()
     {
@@ -115,7 +114,6 @@ class IronMan
     }
     public void Fly()
     {
-        Moove();
         int energyCost = 0;
         foreach (BodyPart bodypart in BodyParts)
             if (bodypart.getName().Equals("LeftLeg") || bodypart.getName().Equals("RightLeg")
@@ -165,13 +163,18 @@ class IronMan
     }
 }
 
-public class Controller : MonoBehaviour {
-    IronMan ironman=new IronMan();
+public class Controller : MonoBehaviour
+{
+    IronMan ironman = new IronMan();
     private float nextActionTime = 0f;
     public float period = 5;
     bool fly = false;
+    bool leftArmShoot = false;
+    bool rightArmShoot = false;
+    bool chestShoot = false;
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         try
         {
             Debug.Log(ironman.getEneryLevel());
@@ -189,24 +192,111 @@ public class Controller : MonoBehaviour {
             Debug.Log(ex.Message);
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            fly = !fly;
-            GetComponent<Animator>().SetBool("Fly", (!GetComponent<Animator>().GetBool("Fly")));
-        }
-
+    void UseFunctions()
+    {
         if (Time.time > nextActionTime)
         {
             nextActionTime += period;
             if (fly)
             {
-                ironman.Fly();
+                try
+                {
+                    ironman.Fly();
+                    GetComponent<Animator>().SetBool("Fly",true);
+                }
+                catch (System.ArgumentException ex)
+                {
+                    Debug.Log(ex.Message+" Kényszerleszállás");
+                }
                 Debug.Log(ironman.getEneryLevel());
-                
+
             }
         }
+        if (chestShoot)
+            {
+                try
+                {
+                    chestShoot = !chestShoot;
+                    ironman.chestShoot();
+                    GetComponent<Animator>().SetTrigger("ChestShoot");
+                }
+                catch (System.ArgumentException ex)
+                {
+                    Debug.Log(ex.Message + " ChestShoot is not working");
+                }
+            }
+        if (leftArmShoot)
+        {
+            try
+            {
+                leftArmShoot = !leftArmShoot;
+                ironman.leftArmShoot();
+                GetComponent<Animator>().SetTrigger("LeftArmShoot");
+            }
+            catch (System.ArgumentException ex)
+            {
+                Debug.Log(ex.Message + " LeftArmShoot is not working");
+            }
+
+        }
+        if (rightArmShoot)
+        {
+            try
+            {
+                rightArmShoot = !rightArmShoot;
+                ironman.rightArmShoot();
+                GetComponent<Animator>().SetTrigger("RightArmShoot");
+            }
+            catch (System.ArgumentException ex)
+            {
+                Debug.Log(ex.Message + " RightArmShoot is not working");
+            }
+
+        }
+        
+    }
+    // Update is called once per frame
+    void Update()
+    {
+        UseFunctions();
+
+        if (ironman.getEneryLevel() > 10)
+        {
+            if (Input.GetKeyDown(KeyCode.F))//On keydown
+            {
+                fly = !fly;
+                if (GetComponent<Animator>().GetBool("Fly") == true)
+                    GetComponent<Animator>().SetBool("Fly", false);
+            }
+            if (Input.GetKeyDown(KeyCode.C))//On keydown
+            {
+                chestShoot = true;
+            }
+        }
+        else if (ironman.getEneryLevel()<=0)
+        {
+            leftArmShoot = false;
+            rightArmShoot = false;
+            chestShoot = false;
+            fly = false;
+            Debug.Log("Ironman ShutDown");
+        }
+
+        else if (fly || ironman.getEneryLevel()<=10)
+        {
+            Debug.Log("Alacson energiszaint -> Energiatakarékos");
+            period = 20;
+            leftArmShoot = false;
+            rightArmShoot = false;
+            chestShoot = false;
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                fly = !fly;
+                GetComponent<Animator>().SetBool("Fly", (!GetComponent<Animator>().GetBool("Fly")));
+
+            }
+        }
+
+        GetComponent<Animator>().SetInteger("Energy", ironman.getEneryLevel());
     }
 }
