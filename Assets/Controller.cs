@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 class BodyPart
 {
     string id;
@@ -168,6 +169,8 @@ public class Controller : MonoBehaviour
     IronMan ironman = new IronMan();
     private float nextActionTime = 0f;
     public float period = 5;
+    public Text EnergyText;
+    private int energy;
     bool fly = false;
     bool leftArmShoot = false;
     bool rightArmShoot = false;
@@ -175,22 +178,7 @@ public class Controller : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        try
-        {
-            Debug.Log(ironman.getEneryLevel());
-            ironman.Moove();
-            Debug.Log(ironman.getEneryLevel());
-            ironman.Fly();
-            Debug.Log(ironman.getEneryLevel());
-            ironman.leftArmShoot();
-            Debug.Log(ironman.getEneryLevel());
-            ironman.chestShoot();
-            Debug.Log(ironman.getEneryLevel());
-        }
-        catch (System.ArgumentException ex)
-        {
-            Debug.Log(ex.Message);
-        }
+        energy = ironman.getEneryLevel();
     }
     void UseFunctions()
     {
@@ -208,7 +196,6 @@ public class Controller : MonoBehaviour
                 {
                     Debug.Log(ex.Message+" Kényszerleszállás");
                 }
-                Debug.Log(ironman.getEneryLevel());
 
             }
         }
@@ -260,7 +247,7 @@ public class Controller : MonoBehaviour
     {
         UseFunctions();
 
-        if (ironman.getEneryLevel() > 10)
+        if (energy > 10)
         {
             if (Input.GetKeyDown(KeyCode.F))//On keydown
             {
@@ -268,12 +255,16 @@ public class Controller : MonoBehaviour
                 if (GetComponent<Animator>().GetBool("Fly") == true)
                     GetComponent<Animator>().SetBool("Fly", false);
             }
-            if (Input.GetKeyDown(KeyCode.C))//On keydown
-            {
+            if (Input.GetMouseButtonDown(2))//On keydown
                 chestShoot = true;
-            }
+            
+            if (Input.GetMouseButtonDown(0))
+                leftArmShoot = true;
+
+            if (Input.GetMouseButtonDown(1))
+                rightArmShoot = true;
         }
-        else if (ironman.getEneryLevel()<=0)
+        else if (energy <= 0)
         {
             leftArmShoot = false;
             rightArmShoot = false;
@@ -282,7 +273,7 @@ public class Controller : MonoBehaviour
             Debug.Log("Ironman ShutDown");
         }
 
-        else if (fly || ironman.getEneryLevel()<=10)
+        else if (fly || energy <= 10)
         {
             Debug.Log("Alacson energiszaint -> Energiatakarékos");
             period = 20;
@@ -296,7 +287,10 @@ public class Controller : MonoBehaviour
 
             }
         }
-
-        GetComponent<Animator>().SetInteger("Energy", ironman.getEneryLevel());
+        energy = ironman.getEneryLevel();
+        if (energy < 0)
+            energy = 0;
+        GetComponent<Animator>().SetInteger("Energy", energy);
+        EnergyText.text = "Energy: " + energy;
     }
 }
