@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+
 class BodyPart
 {
     string id;
@@ -175,13 +176,31 @@ public class Controller : MonoBehaviour
     bool leftArmShoot = false;
     bool rightArmShoot = false;
     bool chestShoot = false;
+	//for monving
+	public float speed;
+	private Rigidbody rb;
+
     // Use this for initialization
     void Start()
     {
         energy = ironman.getEneryLevel();
+		rb = GetComponent<Rigidbody>();
+
     }
+
+	void Moving (){
+		float moveHorizontal = Input.GetAxis ("Horizontal");
+		float moveVertical = Input.GetAxis ("Vertical");
+
+		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
+
+		rb.AddForce (movement * speed);
+	}
+
+
+
     void UseFunctions()
-    {
+    {	
         if (Time.time > nextActionTime)
         {
             nextActionTime += period;
@@ -242,10 +261,16 @@ public class Controller : MonoBehaviour
         }
         
     }
+
+
     // Update is called once per frame
     void Update()
     {
         UseFunctions();
+		Moving ();
+
+
+
 
         if (energy > 10)
         {
@@ -293,4 +318,7 @@ public class Controller : MonoBehaviour
         GetComponent<Animator>().SetInteger("Energy", energy);
         EnergyText.text = "Energy: " + energy;
     }
+
+
+
 }
