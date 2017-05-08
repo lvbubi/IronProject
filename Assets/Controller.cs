@@ -191,8 +191,14 @@ public class Controller : MonoBehaviour
     }
 
 	void Moving (){
-        if(Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W)) {
             transform.position += transform.forward * Time.deltaTime * MovementSpeed;
+            if (!fly)
+                GetComponent<Animator>().SetBool("Walk", true);
+
+        }
+        if (Input.GetKeyUp(KeyCode.W))
+            GetComponent<Animator>().SetBool("Walk", false);
 
         if (Input.GetKey(KeyCode.Space) && fly)
         {
@@ -277,12 +283,15 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var CharacterRotation = Cam.transform.rotation;
-        CharacterRotation.x = 0;
-        CharacterRotation.z = 0;
+        if (Input.GetMouseButton(1))
+        {
+            var CharacterRotation = Cam.transform.rotation;
+            CharacterRotation.x = 0;
+            CharacterRotation.z = 0;
 
-        transform.rotation = CharacterRotation;
+            transform.rotation = CharacterRotation;
 
+        }
         UseFunctions();
 		Moving ();
 
