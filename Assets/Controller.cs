@@ -167,6 +167,7 @@ class IronMan
 
 public class Controller : MonoBehaviour
 {
+    public GameObject Cam;
     IronMan ironman = new IronMan();
     private float nextActionTime = 0f;
     public float period = 5;
@@ -178,6 +179,7 @@ public class Controller : MonoBehaviour
     bool chestShoot = false;
 	//for monving
 	public float speed;
+    public float MovementSpeed;
 	private Rigidbody rb;
 
     // Use this for initialization
@@ -189,13 +191,22 @@ public class Controller : MonoBehaviour
     }
 
 	void Moving (){
-		float moveHorizontal = Input.GetAxis ("Horizontal");
-		float moveVertical = Input.GetAxis ("Vertical");
+        if(Input.GetKey(KeyCode.W))
+            transform.position += transform.forward * Time.deltaTime * MovementSpeed;
 
-		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical);
+        if (Input.GetKey(KeyCode.Space) && fly)
+        {
+            Vector3 movement = new Vector3(0, 5.0f, 0);
 
-		rb.AddForce (movement * speed);
-	}
+            rb.AddForce(movement * MovementSpeed);
+        }
+        if (Input.GetKey(KeyCode.S) && fly)
+        {
+            Vector3 movement = new Vector3(0, -1f, 0);
+
+            rb.AddForce(movement * MovementSpeed);
+        }
+    }
 
 
 
@@ -266,6 +277,12 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        var CharacterRotation = Cam.transform.rotation;
+        CharacterRotation.x = 0;
+        CharacterRotation.z = 0;
+
+        transform.rotation = CharacterRotation;
+
         UseFunctions();
 		Moving ();
 
@@ -279,14 +296,16 @@ public class Controller : MonoBehaviour
                 fly = !fly;
                 if (GetComponent<Animator>().GetBool("Fly") == true)
                     GetComponent<Animator>().SetBool("Fly", false);
+                else
+                    GetComponent<Animator>().SetBool("Fly", true);
             }
             if (Input.GetMouseButtonDown(2))//On keydown
                 chestShoot = true;
             
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.Q))
                 leftArmShoot = true;
 
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetKeyDown(KeyCode.E))
                 rightArmShoot = true;
         }
         else if (energy <= 0)
