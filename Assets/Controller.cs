@@ -196,7 +196,7 @@ public class Controller : MonoBehaviour
             if (!fly)
                 GetComponent<Animator>().SetBool("Walk", true);
 
-        }
+            }
         if (Input.GetKeyUp(KeyCode.W))
             GetComponent<Animator>().SetBool("Walk", false);
 
@@ -234,8 +234,7 @@ public class Controller : MonoBehaviour
                 }
 
             }
-        }
-        if (chestShoot)
+            if (chestShoot && !fly)
             {
                 try
                 {
@@ -248,34 +247,36 @@ public class Controller : MonoBehaviour
                     Debug.Log(ex.Message + " ChestShoot is not working");
                 }
             }
-        if (leftArmShoot)
-        {
-            try
+            if (leftArmShoot && !fly)
             {
-                leftArmShoot = !leftArmShoot;
-                ironman.leftArmShoot();
-                GetComponent<Animator>().SetTrigger("LeftArmShoot");
-            }
-            catch (System.ArgumentException ex)
-            {
-                Debug.Log(ex.Message + " LeftArmShoot is not working");
-            }
+                try
+                {
+                    leftArmShoot = !leftArmShoot;
+                    ironman.leftArmShoot();
+                    GetComponent<Animator>().SetTrigger("LeftArmShoot");
+                }
+                catch (System.ArgumentException ex)
+                {
+                    Debug.Log(ex.Message + " LeftArmShoot is not working");
+                }
 
-        }
-        if (rightArmShoot)
-        {
-            try
-            {
-                rightArmShoot = !rightArmShoot;
-                ironman.rightArmShoot();
-                GetComponent<Animator>().SetTrigger("RightArmShoot");
             }
-            catch (System.ArgumentException ex)
+            if (rightArmShoot && !fly)
             {
-                Debug.Log(ex.Message + " RightArmShoot is not working");
-            }
+                try
+                {
+                    rightArmShoot = !rightArmShoot;
+                    ironman.rightArmShoot();
+                    GetComponent<Animator>().SetTrigger("RightArmShoot");
+                }
+                catch (System.ArgumentException ex)
+                {
+                    Debug.Log(ex.Message + " RightArmShoot is not working");
+                }
 
+            }
         }
+
         
     }
 
@@ -283,17 +284,21 @@ public class Controller : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(1))
+
+        if (energy > 0)
         {
-            var CharacterRotation = Cam.transform.rotation;
-            CharacterRotation.x = 0;
-            CharacterRotation.z = 0;
+            if (Input.GetMouseButton(1))
+            {
+                var CharacterRotation = Cam.transform.rotation;
+                CharacterRotation.x = 0;
+                CharacterRotation.z = 0;
 
-            transform.rotation = CharacterRotation;
+                transform.rotation = CharacterRotation;
 
+            }
+            UseFunctions();
+            Moving();
         }
-        UseFunctions();
-		Moving ();
 
 
 
