@@ -24,6 +24,8 @@ class BodyPart
         if (!durability)
             throw new System.ArgumentException(id+" is broken");
         int number = Random.Range(0, 10);
+        if( id== "LeftLeg" || id == "RightLeg")
+            number = Random.Range(0, 20);
         if (number == 1)
             durability = false;
         return true;
