@@ -22,8 +22,8 @@ class BodyPart
     public bool CheckPart()
     {
         if (!durability)
-            throw new System.ArgumentException(id+" is broken", "original");
-        int number = Random.Range(0, 1000);
+            throw new System.ArgumentException(id+" is broken");
+        int number = Random.Range(0, 10);
         if (number == 1)
             durability = false;
         return true;
@@ -172,11 +172,13 @@ public class Controller : MonoBehaviour
     private float nextActionTime = 0f;
     public float period = 5;
     public Text EnergyText;
+    public Text ErrorText;
     private int energy;
     bool fly = false;
     bool leftArmShoot = false;
     bool rightArmShoot = false;
     bool chestShoot = false;
+    bool flyBroken = false;
 	//for monving
 	public float speed;
     public float MovementSpeed;
@@ -200,7 +202,7 @@ public class Controller : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.W))
             GetComponent<Animator>().SetBool("Walk", false);
 
-        if (Input.GetKey(KeyCode.Space) && fly)
+        if (Input.GetKey(KeyCode.Space) && fly && !flyBroken)
         {
             Vector3 movement = new Vector3(0, 5.0f, 0);
 
@@ -230,6 +232,9 @@ public class Controller : MonoBehaviour
                 }
                 catch (System.ArgumentException ex)
                 {
+                    fly = false;
+                    flyBroken = true;
+                    ErrorText.text = ex.Message + " Kényszerleszállás";
                     Debug.Log(ex.Message+" Kényszerleszállás");
                 }
 
@@ -244,6 +249,7 @@ public class Controller : MonoBehaviour
                 }
                 catch (System.ArgumentException ex)
                 {
+                    ErrorText.text = ex.Message + " ChestShoot is not working";
                     Debug.Log(ex.Message + " ChestShoot is not working");
                 }
             }
@@ -257,6 +263,7 @@ public class Controller : MonoBehaviour
                 }
                 catch (System.ArgumentException ex)
                 {
+                    ErrorText.text = ex.Message + " LeftArmShoot is not working";
                     Debug.Log(ex.Message + " LeftArmShoot is not working");
                 }
 
@@ -271,6 +278,7 @@ public class Controller : MonoBehaviour
                 }
                 catch (System.ArgumentException ex)
                 {
+                    ErrorText.text = ex.Message + " RightArmShoot is not working";
                     Debug.Log(ex.Message + " RightArmShoot is not working");
                 }
 
@@ -328,11 +336,14 @@ public class Controller : MonoBehaviour
             rightArmShoot = false;
             chestShoot = false;
             fly = false;
+            GetComponent<Animator>().SetBool("Fly", false);
+            ErrorText.text = "Ironman ShutDown";
             Debug.Log("Ironman ShutDown");
         }
 
         else if (fly || energy <= 10)
         {
+            ErrorText.text = "Alacson energiszaint -> Energiatakarékos";
             Debug.Log("Alacson energiszaint -> Energiatakarékos");
             period = 20;
             leftArmShoot = false;
@@ -350,6 +361,11 @@ public class Controller : MonoBehaviour
             energy = 0;
         GetComponent<Animator>().SetInteger("Energy", energy);
         EnergyText.text = "Energy: " + energy;
+
+        if (flyBroken && transform.position.y < 10)
+        {
+            GetComponent<Animator>().SetBool("Fly", false);
+        }
     }
 
 
