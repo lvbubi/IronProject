@@ -23,10 +23,10 @@ class BodyPart
     {
         if (!durability)
             throw new System.ArgumentException(id+" is broken");
-        int number = Random.Range(0, 10);
+        int number = Random.Range(0, 50);
         if( id== "LeftLeg" || id == "RightLeg")
-            number = Random.Range(0, 20);
-        if (number == 1)
+            number = Random.Range(0, 100);
+        if (number == 17)
             durability = false;
         return true;
     }
@@ -149,7 +149,7 @@ class IronMan
     {
         int energyCost = 0;
         foreach (BodyPart bodypart in BodyParts)
-            if (bodypart.getName().Equals("Chest"))
+            if (bodypart.getName().Equals("RightArm"))
                 energyCost += bodypart.useFunction();
         energylevel -= energyCost;
     }
@@ -157,7 +157,7 @@ class IronMan
     {
         int energyCost = 0;
         foreach (BodyPart bodypart in BodyParts)
-            if (bodypart.getName().Equals("RightArm"))
+            if (bodypart.getName().Equals("Chest"))
                 energyCost += bodypart.useFunction();
         energylevel -= energyCost;
     }
@@ -351,6 +351,7 @@ public class Controller : MonoBehaviour
             leftArmShoot = false;
             rightArmShoot = false;
             chestShoot = false;
+            flyBroken = true;
             if (Input.GetKeyDown(KeyCode.F))
             {
                 fly = !fly;
